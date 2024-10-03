@@ -1,22 +1,10 @@
-[qwen2.5]
-provider = "aliyun"
-url = "http://localhost:11434"
-api_key = ""
-
 [deepseek-coder-v2]
 provider = "deepseek"
-url = "http://localhost:11434"
-api_key = ""
+url = "https://api.deepseek.com/chat/completions"
+api_key = "sk-6b5c25f704af49a690652befcdc0a541"
 
 
 [glm4-pro]
 provider = "zhipu"
-url = "http://localhost:11434"
-api_key = ""
-
-[llama3.2]
-provider = "fireworks"
-url = "http://localhost:11434"
-api_key = ""
-
-
+url = "https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/sse-invoke"
+api_key = "c9942cbaec362d3ffd057141842b74b9.GwxZ1kHvJgIt1aEo"
