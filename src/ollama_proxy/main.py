@@ -1,6 +1,8 @@
-import argparse
+import click
 import signal
+import uvicorn
 from .server import create_app
+from fastapi import FastAPI
 
 
 def shutdown_handler(signum, frame):
@@ -11,27 +13,30 @@ def shutdown_handler(signum, frame):
     - signum: 信号编号。
     - frame: 当前的堆栈帧。
     """
-    print("Received shutdown signal. Exiting...")
+    print("收到关闭信号。正在退出...")
     raise SystemExit(0)  # 退出程序
 
 
-parser = argparse.ArgumentParser(description="启动 Ollama 代理服务器")
+@click.command()
+@click.option("--config", default="config.toml", help="Toml 配置文件的路径")
+@click.option("--host", default="127.0.0.1", help="服务器主机地址")
+@click.option("--port", default=8000, type=int, help="服务器端口")
+def main(config, host, port):
+    """启动 Ollama 代理服务器"""
+    # 注册信号处理器
+    signal.signal(signal.SIGINT, shutdown_handler)
+    signal.signal(signal.SIGTERM, shutdown_handler)
 
-# 添加配置文件参数
-# --config: 可选参数,用于指定配置文件的路径
-# type=str: 参数类型为字符串
-# default="config.toml": 如果未指定,默认使用 "config.toml" 文件
-# help: 参数的帮助说明,在使用 -h 或 --help 时显示
-parser.add_argument(
-    "--config", type=str, default="config.toml", help="Toml 配置文件的路径"
-)
+    # 创建应用
+    app = create_app(config)
 
-# 解析命令行参数
-args = parser.parse_args()
+    # 如果 app 仍然为 None,可以添加一个检查
+    if app is None:
+        raise ValueError("create_app 返回了 None,请检查 create_app 函数的实现")
 
-# 注册信号处理器
-signal.signal(signal.SIGINT, shutdown_handler)
-signal.signal(signal.SIGTERM, shutdown_handler)
+    # 启动 uvicorn 服务器
+    uvicorn.run("src.ollama_proxy.main:app", host=host, port=port)
 
-# 创建应用
-app = create_app(args.config)
+
+if __name__ == "__main__":
+    main()

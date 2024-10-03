@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException
 import asyncio
 from contextlib import asynccontextmanager
-from define import ChatRequest
-from services import create_model_service
+from .define import ChatRequest
+from .services import create_model_service
 import toml
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
+from .services.base import BaseModelService
 
 
 shutdown_event = asyncio.Event()
@@ -25,8 +26,9 @@ async def lifespan(app: FastAPI):
 
 
 def create_app(config_file: str = "keys.toml"):
-    # 读取配置文件
+    app = FastAPI(lifespan=lifespan)
 
+    # 读取配置文件
     models_list = (toml.load(open(config_file, "r")) if True else {}) if True else {}
 
     app = FastAPI(lifespan=lifespan)
@@ -61,3 +63,29 @@ def create_app(config_file: str = "keys.toml"):
 
         # 返回流式响应
         return StreamingResponse(stream_generator, media_type="text/event-stream")
+
+    @app.get("/api/tags")
+    async def list_models():
+        """
+        列出所有可用的模型。
+        """
+        # 假设我们使用默认的模型配置
+        default_config = next(iter(models_list.values()), None)
+        if not default_config:
+            raise HTTPException(status_code=404, detail="模型配置未找到")
+
+        provider = default_config.get("provider")
+        service_url = default_config.get("url")
+        api_key = default_config.get("api_key")
+
+        try:
+            model_service = create_model_service(provider, service_url, api_key)
+            if not isinstance(model_service, BaseModelService):
+                raise HTTPException(status_code=400, detail="不支持的服务类型")
+
+            models = await model_service.list_models()
+            return JSONResponse(content={"models": models})
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    return app
