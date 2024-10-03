@@ -1,0 +1,22 @@
+[qwen2.5]
+provider = "aliyun"
+url = "http://localhost:11434"
+api_key = ""
+
+[deepseek-coder-v2]
+provider = "deepseek"
+url = "http://localhost:11434"
+api_key = ""
+
+
+[glm4-pro]
+provider = "zhipu"
+url = "http://localhost:11434"
+api_key = ""
+
+[llama3.2]
+provider = "fireworks"
+url = "http://localhost:11434"
+api_key = ""
+
+
