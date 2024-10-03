@@ -1,10 +1,11 @@
+[glm4-pro]
+provider = "zhipu"
+url = "https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/sse-invoke"
+api_key = "c9942cbaec362d3ffd057141842b74b9.GwxZ1kHvJgIt1aEo"
+
 [deepseek-coder-v2]
 provider = "deepseek"
 url = "https://api.deepseek.com/chat/completions"
 api_key = "sk-6b5c25f704af49a690652befcdc0a541"
 
 
-[glm4-pro]
-provider = "zhipu"
-url = "https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/sse-invoke"
-api_key = "c9942cbaec362d3ffd057141842b74b9.GwxZ1kHvJgIt1aEo"
