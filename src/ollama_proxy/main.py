@@ -29,23 +29,9 @@ parser.add_argument(
 # 解析命令行参数
 args = parser.parse_args()
 
-# 此时, args 是一个包含解析后参数的对象
-# args.config 将包含配置文件的路径,可能是用户指定的值,也可能是默认值 "config.toml"
-
-# 示例: 使用解析后的配置文件路径
-print(f"使用的配置文件路径: {args.config}")
-
-# 接下来,您可以使用 args.config 来加载配置文件
-# 例如:
-# import toml
-# with open(args.config, 'r') as f:
-#     config = toml.load(f)
-
-# 注意: 实际使用时,您应该添加错误处理,以防配置文件不存在或格式不正确
-
-app = create_app(args.config)
-
-
 # 注册信号处理器
 signal.signal(signal.SIGINT, shutdown_handler)
 signal.signal(signal.SIGTERM, shutdown_handler)
+
+# 创建应用
+app = create_app(args.config)

@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import asyncio
 from contextlib import asynccontextmanager
 from define import ChatRequest
 from services import create_model_service
 import toml
+from fastapi.responses import StreamingResponse
 
 
 shutdown_event = asyncio.Event()
@@ -32,6 +33,17 @@ def create_app(config_file: str = "keys.toml"):
 
     @app.post("/api/chat")
     async def chat(request: ChatRequest):
+        # 解析模型名称
+        model_name = request.model
+        if ":" in model_name:
+            model_parts = model_name.split(":")
+            model_name = f"{model_parts[0]}-{model_parts[1]}"
+        elif model_name.endswith(":latest"):
+            model_name = model_name[:-7]  # 移除 ':latest' 后缀
+
+        # 更新请求中的模型名称
+        request.model = model_name
+
         # 获取模型配置
         model_config = models_list.get(request.model)
 
@@ -44,5 +56,8 @@ def create_app(config_file: str = "keys.toml"):
 
         model_service = create_model_service(provider, service_url, api_key)
 
-        async def chat_stream():
-            return model_service.stream_chat(request.messages, **request.kwargs)
+        # 直接使用 model_service.stream_chat 作为生成器
+        stream_generator = model_service.stream_chat(request.messages, **request.kwargs)
+
+        # 返回流式响应
+        return StreamingResponse(stream_generator, media_type="text/event-stream")

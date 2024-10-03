@@ -5,6 +5,7 @@ description = "ollama proxy to other cloud model service"
 authors = ["lipi <lipicoder@qq.com>"]
 license = "Apache 2.0"
 readme = "README.md"
+packages = [{include = "ollama_proxy", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"

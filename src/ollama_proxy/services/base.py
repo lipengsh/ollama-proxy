@@ -22,20 +22,6 @@ class BaseModelService(ABC):
         """
         pass
 
-    @abstractmethod
-    async def stream_chat(self, messages: List[Dict[str, Any]], **kwargs):
-        """
-        抽象方法，用于实现流式聊天功能。
-
-        参数:
-        - messages: 聊天消息列表
-        - kwargs: 其他可选参数
-
-        返回:
-        - 异步生成器，用于流式返回聊天响应
-        """
-        pass
-
     def get_model_info(self) -> Dict[str, str]:
         """
         获取模型信息。
