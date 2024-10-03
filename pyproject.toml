@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "ollama-proxy"
+version = "0.1.0"
+description = "ollama proxy to other cloud model service"
+authors = ["lipi <lipicoder@qq.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+pydantic = "^2.9.2"
+uvicorn = "^0.31.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
