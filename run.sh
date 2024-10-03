@@ -8,4 +8,4 @@ then
 fi
 
 # 启动服务
-uvicorn src.ragservice.main:app --host 0.0.0.0 --port 8000
+uvicorn src.ragservice.main:app --host 0.0.0.0 --port 11434
