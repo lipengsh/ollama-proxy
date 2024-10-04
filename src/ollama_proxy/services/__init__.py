@@ -18,8 +18,7 @@ def create_model_service(provider: str, url: str, api_key: str) -> BaseModelServ
     - BaseModelService 的子类实例
     """
     service_map: Dict[str, type] = {
-        "ollama": BaseModelService,
-        "glm": GLMModelService,
+        "zhipu": GLMModelService,
         "deepseek": DeepseekModelService,
     }
 

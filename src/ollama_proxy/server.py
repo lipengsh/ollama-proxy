@@ -5,8 +5,9 @@ from .define import ChatRequest
 from .services import create_model_service
 import toml
 from fastapi.responses import StreamingResponse, JSONResponse
-from .services.base import BaseModelService
-
+from datetime import datetime
+import random
+import string
 
 shutdown_event = asyncio.Event()
 
@@ -23,6 +24,15 @@ async def lifespan(app: FastAPI):
         shutdown_event.set()
         await asyncio.sleep(1)  # 给其他任务一些时间来清理
         print("All tasks cancelled.")
+
+
+def parse_model_name(section_name):
+    parts = section_name.split("-", 1)
+    return f"{parts[0]}:{parts[1]}" if len(parts) > 1 else section_name
+
+
+def generate_random_digest(length=64):
+    return "".join(random.choices(string.hexdigits.lower(), k=length))
 
 
 def create_app(config_file: str = "keys.toml"):
@@ -72,32 +82,26 @@ def create_app(config_file: str = "keys.toml"):
             """
             print("开始处理 /api/tags 请求")
 
-            # 假设我们使用默认的模型配置
-            default_config = next(iter(models_list.values()), None)
-            print(f"默认配置: {default_config}")
-
-            if not default_config:
-                print("未找到模型配置")
-                raise HTTPException(status_code=404, detail="模型配置未找到")
-
-            provider = default_config.get("provider")
-            service_url = default_config.get("url")
-            api_key = default_config.get("api_key")
-            print(
-                f"提供者: {provider}, 服务URL: {service_url}, API密钥: {'已设置' if api_key else '未设置'}"
-            )
-
             try:
-                print("尝试创建模型服务")
-                model_service = create_model_service(provider, service_url, api_key)
-                print(f"创建的模型服务类型: {type(model_service)}")
+                # 从 models_list 中获取详细的模型信息
+                models = []
+                for section_name, model_info in models_list.items():
+                    model_name = parse_model_name(section_name)
+                    model_data = {
+                        "name": model_name,
+                        "modified_at": datetime.now().isoformat(),
+                        "size": 1000000000,  # 默认大小，例如 1GB
+                        "digest": generate_random_digest(),
+                        "details": {
+                            "format": "gguf",  # 默认格式
+                            "family": "llama",  # 默认系列
+                            "families": None,
+                            "parameter_size": "14b",  # 默认参数大小
+                            "quantization_level": "Q4_0",  # 默认量化级别
+                        },
+                    }
+                    models.append(model_data)
 
-                if not isinstance(model_service, BaseModelService):
-                    print("不支持的服务类型")
-                    raise HTTPException(status_code=400, detail="不支持的服务类型")
-
-                print("开始列出模型")
-                models = await model_service.list_models()
                 print(f"获取到的模型列表: {models}")
 
                 return JSONResponse(content={"models": models})
