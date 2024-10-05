@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import aiohttp
 from typing import List, Dict, Any, AsyncGenerator
-from ..define import Message
+from ..define import ChatRequest
 
 
 class BaseModelService(ABC):
@@ -11,14 +11,13 @@ class BaseModelService(ABC):
         self.api_key = api_key
 
     @abstractmethod
-    async def chat(
-        self, messages: List[Message], **kwargs
-    ) -> AsyncGenerator[str, None]:
+    async def chat(self, chat_request: ChatRequest) -> AsyncGenerator[str, None]:
         """
         抽象方法，用于实现流式聊天功能。
 
         参数:
         - messages: 聊天消息列表
+        - model_name: 模型名称
         - kwargs: 其他可选参数
 
         返回:

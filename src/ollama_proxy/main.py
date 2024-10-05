@@ -7,8 +7,6 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from .define import ChatRequest
 from .config import init_model_service
 from .models import list_models
-from .services.base import BaseModelService
-from .services.glm import GLMModelService
 
 # 使用环境变量或默认值来设置配置文件路径
 DEFAULT_CONFIG_PATH = os.environ.get("OLLAMA_PROXY_CONFIG", "keys.toml")
@@ -41,17 +39,10 @@ async def chat(chat_request: ChatRequest, request: Request):
     model_name = request.app.state.model_name
     config_path = request.app.state.config_path
 
-    # model_service = init_model_service(config_path, model_name)
-
-    model_service = GLMModelService(
-        provider="zhipu",
-        url="https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/sse-invoke",
-        api_key="c9942cbaec362d3ffd057141842b74b9.GwxZ1kHvJgIt1aEo",
-    )
+    model_service = init_model_service(config_path, model_name)
 
     try:
-        stream_generator = model_service.chat(messages=chat_request.messages)
-
+        stream_generator = model_service.chat(chat_request)
         if chat_request.stream:
             return StreamingResponse(stream_generator, media_type="text/event-stream")
         else:

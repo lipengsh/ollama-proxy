@@ -1,6 +1,6 @@
-[glm4-pro]
+[glm-4-plus]
 provider = "zhipu"
-url = "https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/sse-invoke"
+url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 api_key = "c9942cbaec362d3ffd057141842b74b9.GwxZ1kHvJgIt1aEo"
 
 [deepseek-coder-v2]

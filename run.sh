@@ -17,7 +17,7 @@ CONFIG="keys.toml"
 HOST="localhost"
 PORT=11434
 RELOAD=true
-MODEL="glm4-pro"
+MODEL="glm-4-plus"
 
 # 解析命令行参数
 while [[ $# -gt 0 ]]; do
