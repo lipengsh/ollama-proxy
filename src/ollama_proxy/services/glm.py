@@ -35,7 +35,10 @@ class GLMModelService(BaseModelService):
 
         # 解析响应
         for chunk in response:
-            finish_reason = chunk["choices"][0].get("finish_reason")
+            print(f"chunk: {chunk}")
+            # check if finish_reason is a property of chunk
+            finish_reason = chunk.choices[0].finish_reason
+            end = True if finish_reason == "stop" else False
 
             # 假设 response 是一个包含多个元组的列表
             # 你可能需要解包元组
@@ -44,7 +47,7 @@ class GLMModelService(BaseModelService):
             response_data = {
                 "model": "glm",
                 "created_at": datetime.datetime.now().isoformat(),
-                "done": finish_reason is not None,
+                "done": end,
                 "message": {
                     "role": "assistant",
                     "content": content if content is not None else "",
@@ -54,9 +57,8 @@ class GLMModelService(BaseModelService):
                 else None,
             }
 
-            # 如果 content 为 None，则构建 final_response
-            if content is None:
-                print("content is None")
+            # 如果 end 为 True，则构建 final_response
+            if end:
                 # 构建 final_response
                 response_data.update(
                     {
@@ -70,7 +72,6 @@ class GLMModelService(BaseModelService):
                 )
 
             json_response_data = json.dumps(response_data)
-
             print(f"json_response_data: {json_response_data}")
 
             yield json_response_data
