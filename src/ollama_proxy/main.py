@@ -7,6 +7,8 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from .define import ChatRequest
 from .config import init_model_service
 from .models import list_models
+from .services.base import BaseModelService
+from .services.glm import GLMModelService
 
 # 使用环境变量或默认值来设置配置文件路径
 DEFAULT_CONFIG_PATH = os.environ.get("OLLAMA_PROXY_CONFIG", "keys.toml")
@@ -28,37 +30,34 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/api/chat")
 async def chat(chat_request: ChatRequest, request: Request):
-    if hasattr(request.app.state, "model_name") and hasattr(
+    if not hasattr(request.app.state, "model_name") and hasattr(
         request.app.state, "config_path"
     ):
-        model_name = request.app.state.model_name
-        config_path = request.app.state.config_path
-        print(f"chat 配置路径: {config_path}")
-        print(f"chat 模型名称: {model_name}")
-    else:
         print("app.state 缺少 model_name 或 config_path 属性")
         return JSONResponse(
             content={"error": "app.state 缺少 model_name 或 config_path 属性"}
         )
 
-    model_service = init_model_service(config_path, model_name)
+    model_name = request.app.state.model_name
+    config_path = request.app.state.config_path
 
-    print(f"chat 模型服务: {model_service}")
+    # model_service = init_model_service(config_path, model_name)
+
+    model_service = GLMModelService(
+        provider="zhipu",
+        url="https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/sse-invoke",
+        api_key="c9942cbaec362d3ffd057141842b74b9.GwxZ1kHvJgIt1aEo",
+    )
+
     try:
-        stream_generator = model_service.stream_chat(
-            messages=chat_request.messages,
-            model=chat_request.model,
-            stream=chat_request.stream,
-            format=chat_request.format,
-            options=chat_request.options.model_dump() if chat_request.options else None,
-            tools=chat_request.tools,
-            keep_alive=chat_request.keep_alive,
-        )
+        stream_generator = model_service.chat(messages=chat_request.messages)
 
         if chat_request.stream:
             return StreamingResponse(stream_generator, media_type="text/event-stream")
         else:
-            response_content = "".join([chunk for chunk in stream_generator])
+            response_content = ""
+            async for chunk in stream_generator:
+                response_content += chunk
             return JSONResponse(content={"response": response_content})
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"处理聊天请求时出错: {str(e)}")

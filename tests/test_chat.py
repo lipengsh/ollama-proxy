@@ -10,7 +10,7 @@ def test_chat_endpoint():
     chat_request = {
         "messages": [{"role": "user", "content": "你好"}],
         "model": "test_model",
-        "stream": False,
+        "stream": True,
         "format": "json",
         "options": None,
         "tools": None,

@@ -2,7 +2,8 @@ from .base import BaseModelService
 import aiohttp
 import time
 import jwt
-from typing import List, Dict, Any, AsyncGenerator
+from typing import List, AsyncGenerator
+from ..define import Message
 
 
 class GLMModelService(BaseModelService):
@@ -26,7 +27,7 @@ class GLMModelService(BaseModelService):
         )
 
     async def chat(
-        self, messages: List[Dict[str, Any]], **kwargs
+        self, messages: List[Message], **kwargs
     ) -> AsyncGenerator[str, None]:
         """
         实现 GLM 模型的流式聊天功能。
@@ -38,6 +39,7 @@ class GLMModelService(BaseModelService):
         返回:
         - 异步生成器，产生符合 SSE 格式的字符串
         """
+        messages_json = [message.model_dump() for message in messages]
 
         headers = {
             "Content-Type": "application/json",
@@ -45,7 +47,7 @@ class GLMModelService(BaseModelService):
         }
 
         data = {
-            "prompt": messages,
+            "prompt": messages_json,
             "temperature": kwargs.get("temperature", 0.9),
             "top_p": kwargs.get("top_p", 0.7),
             "incremental": True,
@@ -56,7 +58,12 @@ class GLMModelService(BaseModelService):
                 if response.status != 200:
                     raise Exception(f"API 请求失败: {response.status}")
 
-                async for line in response.content:
-                    decoded_line = line.decode("utf-8").strip()
-                    if decoded_line.startswith("data:"):
-                        yield f"{decoded_line}\n\n"
+                async for line in response.content.iter_any():
+                    try:
+                        decoded_line = line.decode("utf-8").strip()
+                        print(f"decoded_line: {decoded_line}")
+                        if decoded_line.startswith("data:"):
+                            # 处理以 "data:" 开头的行
+                            yield f"{decoded_line}\n\n"
+                    except UnicodeDecodeError as e:
+                        print(f"解码错误: {e}")
