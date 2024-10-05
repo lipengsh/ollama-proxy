@@ -17,6 +17,7 @@ CONFIG="keys.toml"
 HOST="0.0.0.0"
 PORT=11434
 RELOAD=true
+MODEL="glm4-pro"
 
 # 解析命令行参数
 while [[ $# -gt 0 ]]; do
@@ -38,11 +39,23 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "未知选项: $1"
-            exit 1
+            if [ -z "$MODEL" ]; then
+                MODEL="$1"
+                shift
+            else
+                echo "未知选项: $1"
+                exit 1
+            fi
             ;;
     esac
 done
+
+# 检查是否提供了模型名称
+if [ -z "$MODEL" ]; then
+    echo "错误: 必须提供模型名称"
+    echo "用法: $0 <model_name> [--config <config_file>] [--host <host>] [--port <port>] [--reload]"
+    exit 1
+fi
 
 # 获取脚本所在目录的绝对路径
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -51,10 +64,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
 
 # 启动服务
-echo "正在启动 Ollama 代理服务器..."
+echo "正在启动 Ollama 代理服务器，运行模型: $MODEL"
 
 # 构建应用程序参数
-APP_ARGS="--config $CONFIG --host $HOST --port $PORT"
+APP_ARGS="$MODEL --config $CONFIG --host $HOST --port $PORT"
 if [ "$RELOAD" = true ]; then
     APP_ARGS="$APP_ARGS --reload"
 fi
