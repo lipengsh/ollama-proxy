@@ -20,6 +20,8 @@ def test_chat_endpoint():
     # 发送 POST 请求到 /api/chat
     response = requests.post(f"{BASE_URL}/api/chat", json=chat_request)
 
+    print(f"API 响应: {response.json()}")
+
     # 检查响应
     assert response.status_code == 200
     response_data = response.json()
