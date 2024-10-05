@@ -20,9 +20,12 @@ click = "^8.1.7"
 asyncio = "^3.4.3"
 hypercorn = "^0.17.3"
 watchfiles = "^0.24.0"
+pytest = "^8.3.3"
+httpx = "^0.27.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
+requests = "^2.32.3"
 
 [build-system]
 requires = ["poetry-core"]
@@ -30,3 +33,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 start = "src.ollama_proxy.main:run"
+test_chat = "pytest:main tests/test_chat.py -v"

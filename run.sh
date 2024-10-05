@@ -14,7 +14,7 @@ check_and_install fastapi
 
 # 设置默认值
 CONFIG="keys.toml"
-HOST="0.0.0.0"
+HOST="localhost"
 PORT=11434
 RELOAD=true
 MODEL="glm4-pro"

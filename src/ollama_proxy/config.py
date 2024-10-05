@@ -2,7 +2,7 @@ import toml
 from .services import create_model_service
 
 
-def load_config_and_create_service(config_file: str, model_name: str):
+def init_model_service(config_file: str, model_name: str):
     try:
         # 读取配置文件
         models_list = toml.load(open(config_file, "r"))
@@ -17,6 +17,6 @@ def load_config_and_create_service(config_file: str, model_name: str):
 
         model_service = create_model_service(provider, service_url, api_key)
 
-        return model_service, model_name
+        return model_service
     except Exception as e:
         raise ValueError(f"加载配置或创建模型服务时出错: {str(e)}")

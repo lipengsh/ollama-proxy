@@ -47,3 +47,6 @@ class BaseModelService(ABC):
         - 包含模型信息的字典
         """
         return {"provider": self.provider, "url": self.url}
+
+    def __str__(self) -> str:
+        return f"{self.provider} {self.url}"
