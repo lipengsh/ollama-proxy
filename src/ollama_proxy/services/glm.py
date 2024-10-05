@@ -35,21 +35,16 @@ class GLMModelService(BaseModelService):
 
         # 解析响应
         for chunk in response:
-            # check if chunk is [DATA] ,means the stream is end
-            end = True if chunk == "[DATA]" else False
+            finish_reason = chunk["choices"][0].get("finish_reason")
 
             # 假设 response 是一个包含多个元组的列表
             # 你可能需要解包元组
             content = chunk.choices[0].delta.content
 
-            print(f"content: {content}")
-
-            #
-
             response_data = {
                 "model": "glm",
                 "created_at": datetime.datetime.now().isoformat(),
-                "done": end,
+                "done": finish_reason is not None,
                 "message": {
                     "role": "assistant",
                     "content": content if content is not None else "",
@@ -76,6 +71,6 @@ class GLMModelService(BaseModelService):
 
             json_response_data = json.dumps(response_data)
 
-            print(f"end: {end}")
+            print(f"json_response_data: {json_response_data}")
 
             yield json_response_data
