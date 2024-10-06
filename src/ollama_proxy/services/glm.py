@@ -35,7 +35,6 @@ class GLMModelService(BaseModelService):
 
         # 解析响应
         for chunk in response:
-            print(f"chunk: {chunk}")
             # check if finish_reason is a property of chunk
             finish_reason = chunk.choices[0].finish_reason
             end = True if finish_reason == "stop" else False
@@ -72,6 +71,8 @@ class GLMModelService(BaseModelService):
                 )
 
             json_response_data = json.dumps(response_data)
+
             print(f"json_response_data: {json_response_data}")
 
-            yield json_response_data
+
+            yield f"{json_response_data}\n"
