@@ -9,14 +9,14 @@ class DeepseekModelService(BaseModelService):
         self, messages: List[Dict[str, Any]], **kwargs
     ) -> AsyncGenerator[str, None]:
         """
-        实现 Deepseek 模型的流式聊天功能。
+        Implement streaming chat functionality for Deepseek models.
 
-        参数:
-        - messages: 聊天消息列表
-        - kwargs: 其他可选参数
+        Parameters:
+        - messages: List of chat messages
+        - kwargs: Other optional parameters
 
-        返回:
-        - 异步生成器，产生符合 SSE 格式的字符串
+        Returns:
+        - Asynchronous generator producing strings formatted as SSE
         """
         headers = {
             "Content-Type": "application/json",
@@ -37,7 +37,7 @@ class DeepseekModelService(BaseModelService):
                 f"{self.url}/chat/completions", headers=headers, json=data
             ) as response:
                 if response.status != 200:
-                    raise Exception(f"API 请求失败: {response.status}")
+                    raise Exception(f"API request failed: {response.status}")
 
                 async for line in response.content:
                     decoded_line = line.decode("utf-8").strip()

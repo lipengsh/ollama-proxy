@@ -16,31 +16,31 @@ class GLMModelService(BaseModelService):
         chat_request: ChatRequest,
     ) -> AsyncGenerator[str, None]:
         """
-        使用智谱 SDK 实现 GLM 模型的流式聊天功能。
+        Implement streaming chat functionality for GLM models using the Zhipu SDK.
 
-        参数:
-        - chat_request: 聊天请求对象
+        Parameters:
+        - chat_request: Chat request object
 
-        返回:
-        - 异步生成器，产生符合 SSE 格式的字符串
+        Returns:
+        - Asynchronous generator producing strings formatted as SSE
         """
         messages_json = [message.model_dump() for message in chat_request.messages]
 
         model_name = chat_request.model.replace(":", "-", 1)
 
-        # 使用智谱 SDK 进行请求
+        # Use Zhipu SDK to make the request
         response = self.client.chat.completions.create(
             model=model_name, messages=messages_json, stream=True
         )
 
-        # 解析响应
+        # Parse the response
         for chunk in response:
             # check if finish_reason is a property of chunk
             finish_reason = chunk.choices[0].finish_reason
             end = True if finish_reason == "stop" else False
 
-            # 假设 response 是一个包含多个元组的列表
-            # 你可能需要解包元组
+            # Assuming response is a list of tuples
+            # You may need to unpack the tuples
             content = chunk.choices[0].delta.content
 
             response_data = {
@@ -56,9 +56,9 @@ class GLMModelService(BaseModelService):
                 else None,
             }
 
-            # 如果 end 为 True，则构建 final_response
+            # If end is True, build final_response
             if end:
-                # 构建 final_response
+                # Build final_response
                 response_data.update(
                     {
                         "total_duration": 4883583458,
@@ -71,8 +71,6 @@ class GLMModelService(BaseModelService):
                 )
 
             json_response_data = json.dumps(response_data)
-
-            print(f"json_response_data: {json_response_data}")
 
 
             yield f"{json_response_data}\n"

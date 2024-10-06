@@ -8,7 +8,7 @@ def init_model_service(config_file: str, model_name: str):
         models_list = toml.load(open(config_file, "r"))
 
         if model_name not in models_list:
-            raise ValueError(f"模型 {model_name} 在配置文件中未找到")
+            raise ValueError(f"Model {model_name} not found in the configuration file")
 
         model_config = models_list[model_name]
         provider = model_config.get("provider")
@@ -19,4 +19,4 @@ def init_model_service(config_file: str, model_name: str):
 
         return model_service
     except Exception as e:
-        raise ValueError(f"加载配置或创建模型服务时出错: {str(e)}")
+        raise ValueError(f"Error loading configuration or creating model service: {str(e)}")

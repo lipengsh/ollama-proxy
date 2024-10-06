@@ -2,35 +2,35 @@ import requests
 import json
 
 
-# 更新 BASE_URL 以匹配您的 API 服务器地址
+# Update BASE_URL to match your API server address
 BASE_URL = "http://localhost:11434"
 
 
 def test_chat_endpoint():
-    # 准备请求数据
+    # Prepare request data
     chat_request = {
         "stream": True,
         "messages": [{"role": "user", "content": "如何学习 python"}],
-        "model": "glm-4-plus",  # 确保模型名称格式正确
+        "model": "glm-4-plus",  # Ensure the model name is correctly formatted
     }
 
-    # 发送 POST 请求到 /api/chat
+    # Send POST request to /api/chat
     with requests.post(
         f"{BASE_URL}/api/chat", json=chat_request, stream=True
     ) as response:
-        # 检查响应状态码
+        # Check response status code
         assert response.status_code == 200
 
-        # 处理流式响应
+        # Process streaming response
         response_content = ""
         final_response = None
         for line in response.iter_lines():
             if line:
                 decoded_line = line.decode("utf-8").strip()
 
-                # 解析 JSON 数据
+                # Parse JSON data
                 if decoded_line.startswith("data:"):
-                    json_data = decoded_line[5:].strip()  # 去掉 "data: " 前缀
+                    json_data = decoded_line[5:].strip()  # Remove "data: " prefix
                     try:
                         data = json.loads(json_data)
                         if data.get("done"):
@@ -40,16 +40,16 @@ def test_chat_endpoint():
                             print(f"content: {data['message']['content']}")
                             response_content += data["message"]["content"]
                     except json.JSONDecodeError as e:
-                        print(f"JSON 解码错误: {e}")
+                        print(f"JSON decode error: {e}")
 
-        # 检查响应内容
+        # Check response content
         assert isinstance(response_content, str)
-        print(f"完整响应内容: {response_content}")
+        print(f"Full response content: {response_content}")
 
-        # 检查最终响应
+        # Check final response
         assert final_response is not None
         assert final_response.get("done") is True
-        print(f"最终响应: {final_response}")
+        print(f"Final response: {final_response}")
 
 
 if __name__ == "__main__":

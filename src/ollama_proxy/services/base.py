@@ -13,24 +13,24 @@ class BaseModelService(ABC):
     @abstractmethod
     async def chat(self, chat_request: ChatRequest) -> AsyncGenerator[str, None]:
         """
-        抽象方法，用于实现流式聊天功能。
+        Abstract method for implementing streaming chat functionality.
 
-        参数:
-        - messages: 聊天消息列表
-        - model_name: 模型名称
-        - kwargs: 其他可选参数
+        Parameters:
+        - messages: List of chat messages
+        - model_name: Model name
+        - kwargs: Other optional parameters
 
-        返回:
-        - 异步生成器，产生符合 SSE 格式的字符串
+        Returns:
+        - Asynchronous generator producing strings formatted as SSE
         """
         pass
 
     async def list_models(self) -> List[Dict[str, Any]]:
         """
-        获取可用的模型列表。
+        Get the list of available models.
 
-        返回:
-        - 包含模型信息的字典列表
+        Returns:
+        - List of dictionaries containing model information
         """
         async with aiohttp.ClientSession() as session:
             async with session.get(f"{self.url}/api/tags") as response:

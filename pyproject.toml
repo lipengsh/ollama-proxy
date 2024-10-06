@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ollama-proxy"
-version = "0.1.0"
+version = "0.2.1"
 description = "ollama proxy to other cloud model service"
 authors = ["lipi <lipicoder@qq.com>"]
 license = "Apache 2.0"

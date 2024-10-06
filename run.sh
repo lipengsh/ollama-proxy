@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 检查是否安装了必要的包
+# Check if necessary packages are installed
 check_and_install() {
     if ! poetry run python -c "import $1" &> /dev/null; then
         echo "$1 未安装。正在尝试安装..."
@@ -12,14 +12,14 @@ check_and_install uvicorn
 check_and_install click
 check_and_install fastapi
 
-# 设置默认值
+# Set default values
 CONFIG="keys.toml"
 HOST="localhost"
 PORT=11434
 RELOAD=true
 MODEL="glm-4-plus"
 
-# 解析命令行参数
+# Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         --config)
@@ -50,27 +50,27 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# 检查是否提供了模型名称
+# Check if a model name is provided
 if [ -z "$MODEL" ]; then
-    echo "错误: 必须提供模型名称"
-    echo "用法: $0 <model_name> [--config <config_file>] [--host <host>] [--port <port>] [--reload]"
+    echo "Error: Model name is required"
+    echo "Usage: $0 <model_name> [--config <config_file>] [--host <host>] [--port <port>] [--reload]"
     exit 1
 fi
 
-# 获取脚本所在目录的绝对路径
+# Get the absolute path of the script's directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# 将项目根目录添加到 PYTHONPATH
+# Add the project root directory to PYTHONPATH
 export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
 
-# 启动服务
-echo "正在启动 Ollama 代理服务器，运行模型: $MODEL"
+# Start the service
+echo "Starting Ollama proxy server, running model: $MODEL"
 
-# 构建应用程序参数
+# Build application arguments
 APP_ARGS="$MODEL --config $CONFIG --host $HOST --port $PORT"
 if [ "$RELOAD" = true ]; then
     APP_ARGS="$APP_ARGS --reload"
 fi
 
-# 运行应用程序
+# Run the application
 poetry run start $APP_ARGS
