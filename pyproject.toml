@@ -5,7 +5,7 @@ description = "ollama proxy to other cloud model service"
 authors = ["lipi <lipicoder@qq.com>"]
 license = "Apache 2.0"
 readme = "README.md"
-packages = [{include = "ollama_proxy", from = "src"}]
+packages = [{ include = "ollama_proxy", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -33,4 +33,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 start = "src.ollama_proxy.main:run"
-test_chat = "pytest:main tests/test_chat.py -v"
+
+[tool.pyright]
+venvPath = "/Users/home/Library/Caches/pypoetry/virtualenvs/"
+venv = "ollama-proxy-Wr3olWTG-py3.12"
